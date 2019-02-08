@@ -8,41 +8,40 @@ import {
 } from "react-native";
 
 import { Header, Body, Title, Content, Left, Right } from 'native-base'
+import { connect } from 'react-redux'
 
 class CustomHeader extends Component {
     render() {
       console.log(this.props)
         return (
-            <Header style={styles.header}>
-                <Left>
-                  <TouchableOpacity onPress={() => this.props.drawerOpen()}>
-                    <Image style={styles.image} source={{ uri: this.props.uri}} />
-                  </TouchableOpacity>
-                </Left>
-                <Body>
-                    <Title>{this.props.title}</Title>
-                </Body>
-                <Right />
-            </Header>
+          <Header style={styles.drawerHeader}>
+            <Body>
+              <Image style={styles.drawerImage} source={{ uri: this.props.userInfo.photoURL+'?height=500'}} />
+            </Body>
+          </Header>
         );
     }
 }
-export default CustomHeader;
+const mapStateToProps = (state) => {
+  return state
+}
+export default connect(mapStateToProps)(CustomHeader);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center"
+    justifyContent: 'center',
+    alignItems: 'center'
   },
-  header: {
-
+  drawerHeader: {
+    height: 200,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center'
   },
-  image: {
-    width: 35,
-    height: 35,
-    borderColor: "rgba(0,0,0,0.2)",
-    borderWidth: 3,
-    borderRadius: 150
+  drawerImage: {
+    height: 150,
+    width: 150,
+    borderRadius: 75
   }
+
 })

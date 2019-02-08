@@ -3,11 +3,11 @@ import {
   View,
   Text,
   StyleSheet,
-  Image
+  Image, TouchableOpacity
 } from "react-native";
 
 //library imports
-import { Button, Container, Header, Content, Left } from 'native-base'
+import { Button, Container, Header, Content, Left, Body,Title,Right } from 'native-base'
 import { connect } from 'react-redux'
 
 //custom components imports
@@ -18,8 +18,17 @@ class DashboardScreen extends Component{
     return (
 
       <Container style={styles.container}>
-
-        <CustomHeader title={this.props.navigation.getParam('page')} uri={this.props.userInfo.photoURL} drawerOpen={() => this.props.navigation.navigate('DrawerOpen')} />
+        <Header style={styles.header}>
+            <Left>
+              <TouchableOpacity onPress={() => this.props.navigation.openDrawer()}>
+                <Image style={styles.image} source={{ uri: this.props.userInfo.photoURL+'?height=500'}} />
+              </TouchableOpacity>
+            </Left>
+            <Body>
+                <Title>{this.props.navigation.getParam('page')}</Title>
+            </Body>
+            <Right />
+        </Header>
 
       </Container>
 
@@ -36,15 +45,14 @@ const styles = StyleSheet.create({
   container: {
     marginTop: 23,
     },
-  header: {
-    fontSize: 25
-  },
-  image: {
-    marginTop: 15,
-    width: 150,
-    height: 150,
-    borderColor: "rgba(0,0,0,0.2)",
-    borderWidth: 3,
-    borderRadius: 150
-  }
+    header: {
+
+    },
+    image: {
+      width: 35,
+      height: 35,
+      borderColor: "rgba(0,0,0,0.2)",
+      borderWidth: 3,
+      borderRadius: 150
+    }
 });

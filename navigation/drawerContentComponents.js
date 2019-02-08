@@ -21,7 +21,7 @@ export default class connect(mapStateToProps)(drawerContentComponents) extends C
     return (
         <View style={styles.container}>
             <View style={styles.headerContainer}>
-                  <Image source={{uri:this.props.userInfo.photoURL}}/>
+                  <Image style={styles.image} source={{ uri: this.props.userInfo.photoURL+'?height=500'}} />
             </View>
             <View style={styles.screenContainer}>
                 <View style={styles.screenStyle}>
@@ -63,5 +63,11 @@ const styles = StyleSheet.create({
         fontSize: 20,
         marginLeft: 20
     },
-
+    image: {
+      width: 120,
+      height: 120,
+      borderColor: "rgba(0,0,0,0.2)",
+      borderWidth: 3,
+      borderRadius: 150
+    }
 });
