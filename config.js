@@ -1,3 +1,4 @@
+import Firebase from 'firebase';
 export const firebaseConfig = {
     apiKey: "AIzaSyAE6nn-JOA9BQs2Z_QlZ76oIHf5xkKstpo",
     authDomain: "sharedlist-3e575.firebaseapp.com",
@@ -6,3 +7,5 @@ export const firebaseConfig = {
     storageBucket: "sharedlist-3e575.appspot.com",
     messagingSenderId: "711233545653"
   };
+  let app = Firebase.initializeApp(firebaseConfig);
+  export const db = app.database();

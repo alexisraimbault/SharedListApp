@@ -16,6 +16,24 @@ class LoadingScreen extends Component{
       if (user){
         const action = { type: "USER_INFO", value: user}
         this.props.dispatch(action)
+        firebase.database().ref('users/'+user.uid).once("value", snapshot => {
+          if (!snapshot.exists()){
+            console.log("AJOUUUT!");
+              firebase.database().ref('users/'+user.uid).set({
+                lists:{
+                }
+              });
+              firebase.database().ref('users/'+user.uid+'/lists').push({
+                name:"maison"
+              });
+              firebase.database().ref('users/'+user.uid+'/lists').push({
+                name:"travail"
+              });
+              firebase.database().ref('users/'+user.uid+'/lists').push({
+                name:"loisirs"
+              });
+          }
+        });
         this.props.navigation.navigate('DashboardScreen');
       }
       else{

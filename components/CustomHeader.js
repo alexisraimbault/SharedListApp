@@ -15,7 +15,7 @@ class CustomHeader extends Component {
       console.log(this.props)
         return (
           <Header style={styles.drawerHeader}>
-            <Body>
+            <Body style={styles.container}>
               <Image style={styles.drawerImage} source={{ uri: this.props.userInfo.photoURL+'?height=500'}} />
             </Body>
           </Header>

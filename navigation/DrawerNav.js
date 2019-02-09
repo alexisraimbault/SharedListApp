@@ -34,21 +34,21 @@ const CustomDrawerContentComponent = (props) => (
 
 const Drawer = createDrawerNavigator({
   // For each screen that you can navigate to, create a new entry like this:
-  Travail: {
+  Listes: {
     screen: DashboardScreen,
-    params:{'page':'Travail'}
+    params:{'page':'Listes'}
   },
-  Maison: {
+  Amis: {
     screen: DashboardScreen,
-    params:{'page':'Maison'}
+    params:{'page':'Amis'}
   },
-  Loisirs: {
+  Parametres: {
     screen: DashboardScreen,
-    params:{'page':'Loisirs'}
+    params:{'page':'Parametres'}
   }
 },
   {
-    initialRouteName: 'Maison',
+    initialRouteName: 'Listes',
     drawerPosition: 'left',
     contentComponent: CustomDrawerContentComponent,
     drawerOpenRoute: 'DrawerOpen',

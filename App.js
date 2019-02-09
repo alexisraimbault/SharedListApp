@@ -1,19 +1,19 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import{createAppContainer, createSwitchNavigator} from 'react-navigation';
+import {Container} from 'native-base'
 
 import LoginScreen from './screens/LoginScreen';
 import LoadingScreen from './screens/LoadingScreen';
-import DashboardScreen from './screens/DashboardScreen';
+
 import Drawer from './navigation/DrawerNav';
 import { Font, AppLoading } from "expo";
 import { Provider } from 'react-redux'
 import Store from './store/configureStore'
 
-import firebase from 'firebase';
-import {firebaseConfig} from './config';
-firebase.initializeApp(firebaseConfig);
-
+import firebase from "firebase";
+import {db} from './config';
+import DashboardScreen from './screens/DashboardScreen';
 export default class App extends React.Component {
   constructor(props) {
     super(props);
@@ -35,7 +35,9 @@ export default class App extends React.Component {
     }
     return (
       <Provider store={Store}>
-        <AppNavigator/>
+        <Container style={styles.container}>
+          <AppNavigator/>
+        </Container>
       </Provider>
     )
   }
@@ -52,9 +54,6 @@ const AppNavigator= createAppContainer(AppSwitchNavigator);
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    marginTop: 23,
   },
 });
