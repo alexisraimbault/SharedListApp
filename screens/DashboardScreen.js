@@ -50,6 +50,9 @@ class DashboardScreen extends Component{
             </Body>
             <Right />
         </Header>
+        <TouchableOpacity style={styles.addListFolder} onPress={() => this.props.navigation.openDrawer()}>
+          <Image style={styles.addListFolderImage} source={{ uri: this.props.userInfo.photoURL+'?height=500'}} />
+        </TouchableOpacity>
         <View style={styles.container}>
                         {
                             this.state.items.length > 0
@@ -82,5 +85,18 @@ const styles = StyleSheet.create({
       borderColor: "rgba(0,0,0,0.2)",
       borderWidth: 3,
       borderRadius: 150
+    },
+    addListFolderImage: {
+      width: 70,
+      height: 70,
+      borderColor: "rgba(0,0,0,0.2)",
+      borderWidth: 3,
+      borderRadius: 150
+    },
+    addListFolder: {
+      position: 'absolute',
+      top: '85%',
+      left: '70%',
+      zIndex:3
     }
 });
