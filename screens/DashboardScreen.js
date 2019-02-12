@@ -46,7 +46,7 @@ class DashboardScreen extends Component{
     }
     nav(name){
       alert("test "+name)
-      this.props.navigation.dispatch('ListScreen',{liste:name});
+      this.props.navigation.navigate('Listes',{liste:name});
     }
     componentDidMount() {
         let listsRef = db.ref('users/'+this.props.userInfo.uid+'/lists');

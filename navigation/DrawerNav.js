@@ -16,6 +16,8 @@ import { connect } from 'react-redux'
 //custom files
 import Stack from "./StackNavList"
 import DashboardScreen from "../screens/DashboardScreen";
+import FriendsScreen from "../screens/FriendsScreen";
+import SettingsScreen from "../screens/SettingsScreen";
 import CustomHeader from "../components/CustomHeader"
 
 
@@ -39,12 +41,10 @@ const Drawer = createDrawerNavigator({
     screen: Stack,
   },
   Amis: {
-    screen: DashboardScreen,
-    params:{'page':'Amis'}
+    screen: FriendsScreen,
   },
   Parametres: {
-    screen: DashboardScreen,
-    params:{'page':'Parametres'}
+    screen: SettingsScreen,
   }
 },
   {
