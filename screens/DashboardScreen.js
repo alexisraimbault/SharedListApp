@@ -3,6 +3,7 @@ import {
   View,
   Text,
   StyleSheet,
+  ScrollView,
   Image, TouchableOpacity
 } from "react-native";
 
@@ -11,6 +12,7 @@ import { Button, Container, Header, Content, Left, Body,Title,Right } from 'nati
 import { connect } from 'react-redux'
 import  firebase from "firebase";
 import ItemComponent from '../components/ItemComponent';
+import AddModal from '../components/AddModal';
 import {db} from '../config';
 
 
@@ -22,10 +24,30 @@ import CustomHeader from '../components/CustomHeader'
 
 
 class DashboardScreen extends Component{
+  constructor(props){
+    super(props);
+    this.openAddModal = this.openAddModal.bind(this);
+    this.update = this.update.bind(this);
+    this.scrollEnd = this.scrollEnd.bind(this);
+    this.nav=this.nav.bind(this);
+  }
   state = {
         items: []
     }
-
+    update() {
+    // Force a render with a simulated state change
+    this.setState({ state: this.state });
+    }
+    scrollEnd(){
+      this.refs.scroll.scrollToEnd({animated: true});
+    }
+    openAddModal(){
+      this.refs.addModal.openModal();
+    }
+    nav(name){
+      alert("test "+name)
+      this.props.navigation.dispatch('ListScreen',{liste:name});
+    }
     componentDidMount() {
         let listsRef = db.ref('users/'+this.props.userInfo.uid+'/lists');
         listsRef.on('value', (snapshot) => {
@@ -50,16 +72,22 @@ class DashboardScreen extends Component{
             </Body>
             <Right />
         </Header>
-        <TouchableOpacity style={styles.addListFolder} onPress={() => this.props.navigation.openDrawer()}>
-          <Image style={styles.addListFolderImage} source={{ uri: this.props.userInfo.photoURL+'?height=500'}} />
+        <TouchableOpacity style={styles.addListFolder} onPress={this.openAddModal}>
+          <Image style={styles.addListFolderImage} source={require('../images/add_button.png')} />
         </TouchableOpacity>
         <View style={styles.container}>
+        <ScrollView ref={'scroll'}>
                         {
                             this.state.items.length > 0
-                            ? <ItemComponent items={this.state.items} />
+                            ? <ItemComponent items={this.state.items} nav={this.nav}/>
                             : <Text>No Lists</Text>
                         }
-                    </View>
+        </ScrollView>
+        </View>
+
+        <AddModal ref={'addModal'} uid={this.props.userInfo.uid} update={this.update} scroll={this.scrollEnd}>
+
+        </AddModal>
       </Container>
 
     )
@@ -74,7 +102,7 @@ export default connect(mapStateToProps)(DashboardScreen)
 const styles = StyleSheet.create({
   container: {
       flex:1,
-      justifyContent:'center'
+      justifyContent:'center',
     },
     header: {
 
@@ -91,7 +119,8 @@ const styles = StyleSheet.create({
       height: 70,
       borderColor: "rgba(0,0,0,0.2)",
       borderWidth: 3,
-      borderRadius: 150
+      borderRadius: 150,
+      backgroundColor:'red'
     },
     addListFolder: {
       position: 'absolute',

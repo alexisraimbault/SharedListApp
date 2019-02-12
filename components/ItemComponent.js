@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {  View, Text, StyleSheet, ScrollView} from 'react-native';
+import {  View, Text, StyleSheet, ScrollView, TouchableOpacity} from 'react-native';
 import PropTypes from 'prop-types';
 
 const styles = StyleSheet.create({
@@ -31,26 +31,18 @@ export default class ItemComponent extends Component {
 
   render() {
     return (
-      <ScrollView>
+
         <View style={styles.itemsList}>
           {this.props.items.map((item, index) => {
               return (
-                  <View style={styles.item} key={index}>
+                <TouchableOpacity style={styles.item} key={index} onPress={() =>{this.props.nav(item.name)}}>
+                  <View >
                       <Text style={styles.itemtext}>{item.name}</Text>
                   </View>
+                </TouchableOpacity>
               )
           })}
-          <View style={styles.item} >
-              <Text style={styles.itemtext}>Test</Text>
-          </View>
-          <View style={styles.item} >
-              <Text style={styles.itemtext}>Test</Text>
-          </View>
-          <View style={styles.item} >
-              <Text style={styles.itemtext}>Test</Text>
-          </View>
         </View>
-      </ScrollView>
     );
   }
 }

@@ -14,6 +14,7 @@ import { createDrawerNavigator } from 'react-navigation'
 import { connect } from 'react-redux'
 
 //custom files
+import Stack from "./StackNavList"
 import DashboardScreen from "../screens/DashboardScreen";
 import CustomHeader from "../components/CustomHeader"
 
@@ -35,8 +36,7 @@ const CustomDrawerContentComponent = (props) => (
 const Drawer = createDrawerNavigator({
   // For each screen that you can navigate to, create a new entry like this:
   Listes: {
-    screen: DashboardScreen,
-    params:{'page':'Listes'}
+    screen: Stack,
   },
   Amis: {
     screen: DashboardScreen,
