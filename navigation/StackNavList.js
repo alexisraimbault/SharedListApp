@@ -16,6 +16,7 @@ import { connect } from 'react-redux'
 //custom files
 import DashboardScreen from "../screens/DashboardScreen";
 import ListScreen from "../screens/ListScreen";
+import WriteList from "../screens/WriteList";
 
 const Stack = createStackNavigator({
   // For each screen that you can navigate to, create a new entry like this:
@@ -24,6 +25,9 @@ const Stack = createStackNavigator({
   },
   Listes: {
     screen: ListScreen,
+  },
+  Write: {
+    screen: WriteList,
   }
 },
   {

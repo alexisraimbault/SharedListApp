@@ -32,7 +32,8 @@ class DashboardScreen extends Component{
     this.nav=this.nav.bind(this);
   }
   state = {
-        items: []
+        items: [],
+        keys: []
     }
     update() {
     // Force a render with a simulated state change
@@ -44,16 +45,18 @@ class DashboardScreen extends Component{
     openAddModal(){
       this.refs.addModal.openModal();
     }
-    nav(name){
-      alert("test "+name)
-      this.props.navigation.navigate('Listes',{liste:name});
+    nav(name, ind){
+      console.log(ind);
+      this.props.navigation.navigate('Listes',{liste:name, index: ind});
     }
     componentDidMount() {
-        let listsRef = db.ref('users/'+this.props.userInfo.uid+'/lists');
+        let listsRef = db.ref('users/'+this.props.userInfo.uid+'/lists/');
         listsRef.on('value', (snapshot) => {
             let data = snapshot.val();
+            let keys = Object.keys(data);
             let items = Object.values(data);
             this.setState({items});
+            this.setState({keys});
          });
     }
   render() {
@@ -79,7 +82,7 @@ class DashboardScreen extends Component{
         <ScrollView ref={'scroll'}>
                         {
                             this.state.items.length > 0
-                            ? <ItemComponent items={this.state.items} nav={this.nav}/>
+                            ? <ItemComponent items={this.state.items} keys={this.state.keys} nav={this.nav}/>
                             : <Text>No Lists</Text>
                         }
         </ScrollView>

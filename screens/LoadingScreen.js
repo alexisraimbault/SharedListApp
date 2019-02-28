@@ -24,13 +24,16 @@ class LoadingScreen extends Component{
                 }
               });
               firebase.database().ref('users/'+user.uid+'/lists').push({
-                name:"maison"
+                name:"maison",
+                listes:{}
               });
               firebase.database().ref('users/'+user.uid+'/lists').push({
-                name:"travail"
+                name:"travail",
+                listes:{}
               });
               firebase.database().ref('users/'+user.uid+'/lists').push({
-                name:"loisirs"
+                name:"loisirs",
+                listes:{}
               });
           }
         });

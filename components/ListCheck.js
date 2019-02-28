@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
     }
 });
 
-export default class ItemComponent extends Component {
+export default class ListCheck extends Component {
 
   static propTypes = {
       items: PropTypes.array.isRequired
@@ -35,9 +35,9 @@ export default class ItemComponent extends Component {
         <View style={styles.itemsList}>
           {this.props.items.map((item, index) => {
               return (
-                <TouchableOpacity style={styles.item} key={index} onPress={() =>{this.props.nav(item.name, this.props.keys[index])}}>
+                <TouchableOpacity style={styles.item} key={index}>
                   <View >
-                      <Text style={styles.itemtext}>{item.name}</Text>
+                      <Text style={styles.itemtext}>{item}</Text>
                   </View>
                 </TouchableOpacity>
               )
