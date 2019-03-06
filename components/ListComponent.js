@@ -35,7 +35,7 @@ export default class ListComponent extends Component {
         <View style={styles.itemsList}>
           {this.props.items.map((item, index) => {
               return (
-                <TouchableOpacity style={styles.item} key={index} onPress={() =>{this.props.nav(item.name,this.props.keys[index])}}>
+                <TouchableOpacity style={styles.item} key={index} onPress={() =>{this.props.nav(this.props.lists[index],item.key)}}>
                   <View >
                       <Text style={styles.itemtext}>{this.props.lists[index]}</Text>
                   </View>

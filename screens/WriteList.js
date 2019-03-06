@@ -19,63 +19,104 @@ import {db} from '../config';
 class WriteList extends Component{
   constructor(props){
     super(props);
+    this.type = this.type.bind(this);
+    this.push = this.push.bind(this);
     this.state ={
+      text: [],
+      items: [],
       keys: [],
       newListContent:'',
-      items: [],
-      list: true
+      check: [],
+      list: true,
+      listText : ""
     }
   }
 
-  componentDidMount() {
-      let listsRef = db.ref('users/'+this.props.userInfo.uid+'/lists/'+this.props.navigation.getParam('index1')+'/'+this.props.navigation.getParam('liste1')+'/'+this.props.navigation.getParam('index'));
-      listsRef.once('value', (snapshot) => {
-          if (snapshot.exists()){
-            let data = snapshot.val();
-            let items = Object.values(data);
-            this.setState({newListContent: data.text});
-            this.setState({list: data.list})
-          }
-       });
-       let listsRef2 = db.ref('users/'+this.props.userInfo.uid+'/lists/'+this.props.navigation.getParam('index1')+'/'+this.props.navigation.getParam('liste1')+'/'+this.props.navigation.getParam('index')+'/items');
-       listsRef2.on('value', (snapshot) => {
-         if (!snapshot.exists()){
-           listsRef2.push({
-             check : false,
-             text : ''
-           });
-         }
-         });
-
+  type(ind, text){
+    var ref = db.ref("lists/"+this.props.navigation.getParam('index')+'/items/'+this.state.keys[ind]);
+    ref.update({text : text});
+    var tmp = this.state.text;
+    tmp[ind] = text;
+    this.setState({text : tmp});
   }
-  render() {
-    let listsRef2 = db.ref('users/'+this.props.userInfo.uid+'/lists/'+this.props.navigation.getParam('index1')+'/'+this.props.navigation.getParam('liste1')+'/'+this.props.navigation.getParam('index')+'/items');
-    listsRef2.on('value', (snapshot) => {
+
+  push(ind){
+    for(let i = ind+1; i < this.state.keys.length; i++){
+      var ref = db.ref("lists/"+this.props.navigation.getParam('index')+'/items/'+this.state.keys[i]);
+      ref.update({ind : i+1});
+    }
+    var ref = db.ref("lists/"+this.props.navigation.getParam('index')+'/items');
+    var tmpKey = ref.push({
+      check : false,
+      text : '',
+      ind : ind+1
+    }).key;
+    var tmp1 = this.state.keys;
+    var tmp2 = this.state.text;
+    tmp1.splice(ind+1, 0, tmpKey);
+    tmp2.splice(ind+1, 0, '');
+    this.setState({keys: tmp1});
+    this.setState({text: tmp2});
+  }
+
+  addList(listItem,i){//todo add items
+    var tmp1 = this.state.check;
+    var tmp2 = this.state.text;
+    const tmp3 = this.state.listText;
+    tmp1.push(listItem.check);
+    tmp2.push(listItem.text);
+    const tmp4 = tmp3  + listItem.text;
+    this.setState({check : tmp1});
+    this.setState({text : tmp2});
+    this.setState({listText : tmp4});
+  }
+  getLists(items){
+    for(let i=0; i < items.length ; i++){
+          this.addList(items[i],i);
+      }
+  }
+  componentDidMount() {
+    var ref = db.ref("lists/"+this.props.navigation.getParam('index'));
+    ref.on("value", function(snapshot) {
+      if (snapshot.exists()){
+        let data = snapshot.val();
+        let items = Object.values(data);
+        this.setState({newListContent: data.text});
+        this.setState({list: data.list})
+      }
+    }.bind(this));
+
+    var ref2 = db.ref("lists/"+this.props.navigation.getParam('index')+'/items');
+    ref2.orderByChild('ind').once("value", function(snapshot) {
       if (!snapshot.exists()){
-        listsRef2.push({
+        ref2.push({
           check : false,
-          text : ''
+          text : '',
+          ind : 0
         });
       }
       else{
-        var data1 = [];
-        snapshot.forEach(function(data) {
-          var tmp=data.val().text;
-          data1.push(tmp);
-        });
-        console.log('DATA1');
-        console.log(data1);
+        let data = snapshot.val();
+        let keys = Object.keys(data);
+        let items = Object.values(data);
+        this.setState({listText:""});
+        this.getLists(items);
+        this.setState({items});
+        this.setState({keys});
+        console.log(this.state.keys);
       }
-      });
-    return (
+    }.bind(this));
 
-      <View>
+  }
+  render() {
+    return (
+      <Container >
       <Text>
         Rédiger la liste {this.props.navigation.getParam('liste')}
       </Text>
       <Switch
          onValueChange = {()=>{
-           let listsRef = db.ref('users/'+this.props.userInfo.uid+'/lists/'+this.props.navigation.getParam('index1')+'/'+this.props.navigation.getParam('liste1')+'/'+this.props.navigation.getParam('index'));
+           let listsRef = db.ref("lists/"+this.props.navigation.getParam('index'));
            if(this.state.list){
              this.setState({list: false});
              listsRef.update({
@@ -91,14 +132,20 @@ class WriteList extends Component{
 
          value = {this.state.list}/>
 
-         <View style={styles.container}>
-         <ScrollView ref={'scroll'}>
-                         {   <ListCheck items={["tesssst"]}/>
-                         }
-         </ScrollView>
-         </View>
-      </View>
 
+         {
+           this.state.list
+           ?<View style={styles.container}><ScrollView ref={'scroll'}>
+           {
+               this.state.text.length > 0
+               ? <ListCheck items={this.state.text} type = {this.type} push = {this.push}/>
+               : <Text>No Items</Text>
+           }
+           </ScrollView></View>
+           :<TextInput multiline = {true} numberOfLines = {this.state.text.length} value = {this.state.text.join('\n')}/>
+        }
+
+         </Container>
     )
   }
 }

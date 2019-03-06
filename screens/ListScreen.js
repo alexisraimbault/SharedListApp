@@ -40,16 +40,18 @@ class ListScreen extends Component{
         lists: []
     }
     update() {
+      this.setState({lists: []});
       let listsRef = db.ref('users/'+this.props.userInfo.uid+'/lists/'+this.props.navigation.getParam('index')+'/'+this.props.navigation.getParam('liste'));
-      listsRef.once('value', (snapshot) => {
+      listsRef.once('value').then(function(snapshot) {
           if (snapshot.exists()){
             let data = snapshot.val();
             let keys = Object.keys(data);
             let items = Object.values(data);
+            this.getLists(items);
             this.setState({items});
             this.setState({keys});
           }
-       });
+       }.bind(this));
     }
     scrollEnd(){
       this.refs.scroll.scrollToEnd({animated: true});
@@ -58,12 +60,17 @@ class ListScreen extends Component{
       this.refs.addModal.openModal();
     }
     nav(name, ind){
-      this.props.navigation.navigate('Write',{liste:name, index: ind, index1: this.props.navigation.getParam('index'), liste1: this.props.navigation.getParam('liste')});
+      this.props.navigation.navigate('Write',{liste:name, index: ind});
     }
     addList(listItem,i){//todo add items
       var tmp=this.state.lists;
-      tmp.push(listItem[1]);
-      this.setState({list : tmp});
+      if(listItem.length == 3){
+        tmp.push(listItem[1]);
+      }
+      else{
+        tmp.push(listItem[2]);
+      }
+      this.setState({lists : tmp});
     }
     getLists(items){
       for(let i=0; i < items.length ; i++){
@@ -112,7 +119,7 @@ class ListScreen extends Component{
         <ScrollView ref={'scroll'}>
                         {
                             this.state.lists.length > 0
-                            ? <ListComponent items={this.state.items} keys={this.state.keys} nav={this.nav} lists={this.state.lists}/>
+                            ? <ListComponent items={this.state.items} keys={this.state.items} nav={this.nav} lists={this.state.lists}/>
                             : <Text>No Lists</Text>
                         }
         </ScrollView>
