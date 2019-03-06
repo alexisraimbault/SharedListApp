@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import {  View, Text, StyleSheet, TextInput, ScrollView,Image, TouchableOpacity} from 'react-native';
+import { CheckBox } from 'react-native-elements'
 import PropTypes from 'prop-types';
 
 const styles = StyleSheet.create({
@@ -30,12 +31,23 @@ const styles = StyleSheet.create({
     addListFolder: {
       position: 'absolute',
       top: '20%',
-      left: '85%',
+      left: '90%',
       zIndex:3
     },
     itemtext: {
-      fontSize: 24,
-      fontWeight: 'bold',
+      position: 'absolute',
+      fontSize: 20,
+      top: '20%',
+      left : '15%',
+      textAlign: 'left',
+    },
+    itemtextchecked: {
+      textDecorationLine: 'line-through',
+      textDecorationStyle: 'solid',
+      position: 'absolute',
+      fontSize: 20,
+      top: '20%',
+      left : '15%',
       textAlign: 'left',
     }
 });
@@ -47,23 +59,43 @@ export default class ListCheck extends Component {
   };
 
   render() {
-    console.log("tests listCheck :");
-    console.log(this.props.items);
     return (
 
         <View style={styles.itemsList}>
           {this.props.items.map((item, index) => {
-              return (
+              return this.props.check[index]
+              ?(
                   <View style={styles.item} key={index}>
-                      <TextInput style = {styles.itemtext} value = {item}
-                                  onChangeText={(text) =>{this.props.type(index, text)}}/>
+                      <CheckBox
+                      checked={this.props.check[index]}
+                      onPress={() => this.props.doCheck(index)}
+                      />
+                      <Text style = {styles.itemtextchecked} >{item}</Text>
+
+
                       <TouchableOpacity style={styles.addListFolder} onPress={() =>{this.props.push(index)}}>
                         <Image style={styles.addListFolderImage} source={require('../images/add_button.png')} />
                       </TouchableOpacity>
                   </View>
               )
-          })}
+    :
+    (
+        <View style={styles.item} key={index}>
+            <CheckBox
+            checked={this.props.check[index]}
+            onPress={() => this.props.doCheck(index)}
+            />
+
+            <TextInput style = {styles.itemtext} value = {item}
+                            onChangeText={(text) =>{this.props.type(index, text)}}/>
+
+            <TouchableOpacity style={styles.addListFolder} onPress={() =>{this.props.push(index)}}>
+              <Image style={styles.addListFolderImage} source={require('../images/add_button.png')} />
+            </TouchableOpacity>
         </View>
-    );
+    )
+})}
+</View>
+)
   }
 }

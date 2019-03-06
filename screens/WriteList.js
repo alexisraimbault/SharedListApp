@@ -21,6 +21,7 @@ class WriteList extends Component{
     super(props);
     this.type = this.type.bind(this);
     this.push = this.push.bind(this);
+    this.check = this.check.bind(this);
     this.state ={
       text: [],
       items: [],
@@ -57,6 +58,14 @@ class WriteList extends Component{
     tmp2.splice(ind+1, 0, '');
     this.setState({keys: tmp1});
     this.setState({text: tmp2});
+  }
+
+  check(ind){
+    var tmp1 = this.state.check;
+    tmp1[ind] = !tmp1[ind];
+    this.setState({check : tmp1});
+    var ref = db.ref("lists/"+this.props.navigation.getParam('index')+'/items/'+this.state.keys[ind]);
+    ref.update({check : tmp1[ind]});
   }
 
   addList(listItem,i){//todo add items
@@ -111,9 +120,6 @@ class WriteList extends Component{
   render() {
     return (
       <Container >
-      <Text>
-        Rédiger la liste {this.props.navigation.getParam('liste')}
-      </Text>
       <Switch
          onValueChange = {()=>{
            let listsRef = db.ref("lists/"+this.props.navigation.getParam('index'));
@@ -138,7 +144,7 @@ class WriteList extends Component{
            ?<View style={styles.container}><ScrollView ref={'scroll'}>
            {
                this.state.text.length > 0
-               ? <ListCheck items={this.state.text} type = {this.type} push = {this.push}/>
+               ? <ListCheck items = {this.state.text} check = {this.state.check} type = {this.type} push = {this.push} doCheck = {this.check}/>
                : <Text>No Items</Text>
            }
            </ScrollView></View>

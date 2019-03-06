@@ -1,9 +1,13 @@
 {
   "expo": {
     "name": "sharedList",
+    "version": "1.0.0",
     "slug": "listev1",
     "privacy": "public",
     "sdkVersion": "32.0.0",
+    "android": {
+      "package": "com.diz11.sharedList"
+    },
     "platforms": [
       "ios",
       "android"
@@ -23,7 +27,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.diz11.sharedList"
     },
     "description": ""
   }
