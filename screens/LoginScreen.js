@@ -7,8 +7,9 @@ class LoginScreen extends Component{
 
   async loginWithFacebook(){
 
-    const{type,token}=await Expo.Facebook.logInWithReadPermissionsAsync('539148109924840',{permissions: ['public_profile','email','user_friends']})
+    const{type,token}=await Expo.Facebook.logInWithReadPermissionsAsync('539148109924840',{permissions: ['public_profile','email']})
     if (type=='success'){
+
       const credential = firebase.auth.FacebookAuthProvider.credential(token)
       firebase.auth().signInAndRetrieveDataWithCredential(credential).then(data =>{console.log('USER_ID',data.user.uid);}).catch((error)=>{
         console.log(error)

@@ -52,11 +52,13 @@ class DashboardScreen extends Component{
     componentDidMount() {
         let listsRef = db.ref('users/'+this.props.userInfo.uid+'/lists/');
         listsRef.on('value', (snapshot) => {
-            let data = snapshot.val();
-            let keys = Object.keys(data);
-            let items = Object.values(data);
-            this.setState({items});
-            this.setState({keys});
+          if(snapshot.exists()){
+              let data = snapshot.val();
+              let keys = Object.keys(data);
+              let items = Object.values(data);
+              this.setState({items});
+              this.setState({keys});
+            }
          });
     }
   render() {

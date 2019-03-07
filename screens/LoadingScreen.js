@@ -18,7 +18,6 @@ class LoadingScreen extends Component{
         this.props.dispatch(action)
         firebase.database().ref('users/'+user.uid).once("value", snapshot => {
           if (!snapshot.exists()){
-            console.log("AJOUUUT!");
               firebase.database().ref('users/'+user.uid).set({
                 lists:{
                 }
@@ -34,6 +33,11 @@ class LoadingScreen extends Component{
               firebase.database().ref('users/'+user.uid+'/lists').push({
                 name:"loisirs",
                 listes:{}
+              });
+              firebase.database().ref('userList').push({
+                uid : user.uid,
+                displayName : user.displayName,
+                photoURL : user.photoURL,
               });
           }
         });
