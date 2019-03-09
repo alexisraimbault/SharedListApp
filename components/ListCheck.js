@@ -87,7 +87,8 @@ export default class ListCheck extends Component {
             />
 
             <TextInput style = {styles.itemtext} value = {item}
-                            onChangeText={(text) =>{this.props.type(index, text)}}/>
+                            onChangeText={(text) =>{this.props.type(index, text)}}
+                            onEndEditing={() =>{this.props.submit(index)}}/>
 
             <TouchableOpacity style={styles.addListFolder} onPress={() =>{this.props.push(index)}}>
               <Image style={styles.addListFolderImage} source={require('../images/add_button.png')} />

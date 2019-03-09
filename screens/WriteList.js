@@ -22,23 +22,33 @@ class WriteList extends Component{
     this.type = this.type.bind(this);
     this.push = this.push.bind(this);
     this.check = this.check.bind(this);
+    this.submit = this.submit.bind(this);
     this.state ={
       text: [],
       items: [],
       keys: [],
+      sortedKeys: [],
       newListContent:'',
       check: [],
       list: true,
+      updating: false,
       listText : ""
     }
   }
 
   type(ind, text){
-    var ref = db.ref("lists/"+this.props.navigation.getParam('index')+'/items/'+this.state.keys[ind]);
-    ref.update({text : text});
+    //var ref = db.ref("lists/"+this.props.navigation.getParam('index')+'/items/'+this.state.keys[ind]);
+    //ref.update({text : text});
     var tmp = this.state.text;
     tmp[ind] = text;
     this.setState({text : tmp});
+  }
+  submit(ind){
+    var ref = db.ref("lists/"+this.props.navigation.getParam('index')+'/items/'+this.state.keys[ind]);
+    ref.update({text : this.state.text[ind]});
+    //var tmp = this.state.text;
+    //tmp[ind] = text;
+    //this.setState({text : tmp});
   }
 
   push(ind){
@@ -46,29 +56,32 @@ class WriteList extends Component{
       var ref = db.ref("lists/"+this.props.navigation.getParam('index')+'/items/'+this.state.keys[i]);
       ref.update({ind : i+1});
     }
+
+
     var ref = db.ref("lists/"+this.props.navigation.getParam('index')+'/items');
     var tmpKey = ref.push({
       check : false,
       text : '',
       ind : ind+1
     }).key;
-    var tmp1 = this.state.keys;
-    var tmp2 = this.state.text;
-    tmp1.splice(ind+1, 0, tmpKey);
-    tmp2.splice(ind+1, 0, '');
-    this.setState({keys: tmp1});
-    this.setState({text: tmp2});
+
+    //var tmp1 = this.state.keys;
+    //var tmp2 = this.state.text;
+    //tmp1.splice(ind+1, 0, tmpKey);
+    //tmp2.splice(ind+1, 0, '');
+    //this.setState({keys: tmp1});
+    //this.setState({text: tmp2});
   }
 
   check(ind){
     var tmp1 = this.state.check;
     tmp1[ind] = !tmp1[ind];
-    this.setState({check : tmp1});
+    //this.setState({check : tmp1});
     var ref = db.ref("lists/"+this.props.navigation.getParam('index')+'/items/'+this.state.keys[ind]);
     ref.update({check : tmp1[ind]});
   }
 
-  addList(listItem,i){//todo add items
+  addList(listItem,i){
     var tmp1 = this.state.check;
     var tmp2 = this.state.text;
     const tmp3 = this.state.listText;
@@ -81,12 +94,31 @@ class WriteList extends Component{
   }
   getLists(items){
     for(let i=0; i < items.length ; i++){
-          this.addList(items[i],i);
+      items[i].key = this.state.keys[i];
+    }
+    items.sort((a,b)=> a.ind - b.ind)
+    console.log("teest1 :")
+    var tmp1 = [];
+    var tmp2 = [];
+    var tmpk = [];
+    var tmp3 = '';
+    console.log(this.state.text);
+    for(let i=0; i < items.length ; i++){
+      tmp1.push(items[i].check);
+      tmp2.push(items[i].text);
+      tmpk.push(items[i].key);
+      var tmp4 = tmp3  + items[i].text;
       }
+      this.setState({check : tmp1});
+      this.setState({text : tmp2});
+      this.setState({keys : tmpk});
+      this.setState({listText : tmp4});
+      console.log("teest2 :")
+      console.log(this.state.text)
   }
   componentDidMount() {
     var ref = db.ref("lists/"+this.props.navigation.getParam('index'));
-    ref.on("value", function(snapshot) {
+    ref.once("value", function(snapshot) {
       if (snapshot.exists()){
         let data = snapshot.val();
         let items = Object.values(data);
@@ -96,7 +128,7 @@ class WriteList extends Component{
     }.bind(this));
 
     var ref2 = db.ref("lists/"+this.props.navigation.getParam('index')+'/items');
-    ref2.orderByChild('ind').once("value", function(snapshot) {
+    ref2.orderByChild('ind').on("value", function(snapshot) {
       if (!snapshot.exists()){
         ref2.push({
           check : false,
@@ -105,15 +137,20 @@ class WriteList extends Component{
         });
       }
       else{
+
         let data = snapshot.val();
         let keys = Object.keys(data);
         let items = Object.values(data);
-        this.setState({listText:""});
-        this.getLists(items);
-        this.setState({items});
-        this.setState({keys});
-        console.log(this.state.keys);
+
+        this.setState({items},()=>{
+          this.setState({keys});
+          this.setState({listText:""});
+          this.setState({check : []});
+          this.setState({text : []},()=> this.getLists(items));
+        });
+
       }
+
     }.bind(this));
 
   }
@@ -144,7 +181,7 @@ class WriteList extends Component{
            ?<View style={styles.container}><ScrollView ref={'scroll'}>
            {
                this.state.text.length > 0
-               ? <ListCheck items = {this.state.text} check = {this.state.check} type = {this.type} push = {this.push} doCheck = {this.check}/>
+               ? <ListCheck items = {this.state.text} check = {this.state.check} type = {this.type} submit = {this.submit} push = {this.push} doCheck = {this.check}/>
                : <Text>No Items</Text>
            }
            </ScrollView></View>
