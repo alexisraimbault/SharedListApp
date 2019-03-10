@@ -12,6 +12,7 @@ import { Button, Container, Header, Content, Left, Body,Title,Right } from 'nati
 import { connect } from 'react-redux'
 import  firebase from "firebase";
 import ListCheck from '../components/ListCheck';
+import ShareModal from '../components/ShareModal';
 import {db} from '../config';
 
 //custom components imports
@@ -19,11 +20,16 @@ import {db} from '../config';
 class WriteList extends Component{
   constructor(props){
     super(props);
+    this.openShareModal = this.openShareModal.bind(this);
+    this.focusDone=this.focusDone.bind(this);
     this.type = this.type.bind(this);
     this.push = this.push.bind(this);
+    this.remove = this.remove.bind(this);
     this.check = this.check.bind(this);
     this.submit = this.submit.bind(this);
+    this.share = this.share.bind(this);
     this.state ={
+      focus: -1,
       text: [],
       items: [],
       keys: [],
@@ -34,6 +40,9 @@ class WriteList extends Component{
       updating: false,
       listText : ""
     }
+  }
+  openShareModal(){
+    this.refs.shareModal.openModal();
   }
 
   type(ind, text){
@@ -64,7 +73,7 @@ class WriteList extends Component{
       text : '',
       ind : ind+1
     }).key;
-
+    this.setState({focus :ind+1});
     //var tmp1 = this.state.keys;
     //var tmp2 = this.state.text;
     //tmp1.splice(ind+1, 0, tmpKey);
@@ -72,7 +81,45 @@ class WriteList extends Component{
     //this.setState({keys: tmp1});
     //this.setState({text: tmp2});
   }
+  remove(ind){
+    for(let i = ind+1; i < this.state.keys.length; i++){
+      var ref = db.ref("lists/"+this.props.navigation.getParam('index')+'/items/'+this.state.keys[i]);
+      ref.update({ind : i-1});
+    }
 
+
+    db.ref('lists/'+this.props.navigation.getParam('index')+'/items/').child(this.state.keys[ind]).remove();
+    //var tmp1 = this.state.keys;
+    //var tmp2 = this.state.text;
+    //tmp1.splice(ind+1, 0, tmpKey);
+    //tmp2.splice(ind+1, 0, '');
+    //this.setState({keys: tmp1});
+    //this.setState({text: tmp2});
+  }
+  share(uid){
+      var ref = db.ref('users/'+uid+'/lists');
+      ref.once('value', function(snapshot) {
+        if(snapshot.exists()){
+            let data = snapshot.val();
+            let keys = Object.keys(data);
+            let items = Object.values(data);
+            if(!items.includes('shared')){
+              var key = ref.push({name : 'shared'}).key;
+              ref = db.ref("users/"+uid+"/lists/"+key+"/shared");
+              ref.push({key :this.props.navigation.getParam('index')});
+            }
+            else{
+              var index = items.indexOf('shared');
+              ref = db.ref("users/"+uid+"/lists/"+keys[index]);
+              ref.push(this.props.navigation.getParam('index'));
+            }
+          }
+       }.bind(this))
+  }
+
+  focusDone(){
+    this.setState({focus :-1});
+  }
   check(ind){
     var tmp1 = this.state.check;
     tmp1[ind] = !tmp1[ind];
@@ -97,12 +144,10 @@ class WriteList extends Component{
       items[i].key = this.state.keys[i];
     }
     items.sort((a,b)=> a.ind - b.ind)
-    console.log("teest1 :")
     var tmp1 = [];
     var tmp2 = [];
     var tmpk = [];
     var tmp3 = '';
-    console.log(this.state.text);
     for(let i=0; i < items.length ; i++){
       tmp1.push(items[i].check);
       tmp2.push(items[i].text);
@@ -113,8 +158,6 @@ class WriteList extends Component{
       this.setState({text : tmp2});
       this.setState({keys : tmpk});
       this.setState({listText : tmp4});
-      console.log("teest2 :")
-      console.log(this.state.text)
   }
   componentDidMount() {
     var ref = db.ref("lists/"+this.props.navigation.getParam('index'));
@@ -174,6 +217,9 @@ class WriteList extends Component{
          }}
 
          value = {this.state.list}/>
+         <TouchableOpacity style={styles.shareModal} onPress={this.openShareModal}>
+           <Image style={styles.shareModalImage} source={require('../images/add_button.png')} />
+         </TouchableOpacity>
 
 
          {
@@ -181,14 +227,17 @@ class WriteList extends Component{
            ?<View style={styles.container}><ScrollView ref={'scroll'}>
            {
                this.state.text.length > 0
-               ? <ListCheck items = {this.state.text} check = {this.state.check} type = {this.type} submit = {this.submit} push = {this.push} doCheck = {this.check}/>
+               ? <ListCheck items = {this.state.text} check = {this.state.check} focus = {this.state.focus} focusDone = {this.focusDone} type = {this.type} submit = {this.submit} push = {this.push} remove = {this.remove} doCheck = {this.check}/>
                : <Text>No Items</Text>
            }
            </ScrollView></View>
            :<TextInput multiline = {true} numberOfLines = {this.state.text.length} value = {this.state.text.join('\n')}/>
         }
+        <ShareModal ref={'shareModal'} uid={this.props.userInfo.uid}  share = {this.share}>
 
+        </ShareModal>
          </Container>
+
     )
   }
 }
@@ -213,7 +262,7 @@ const styles = StyleSheet.create({
       borderWidth: 3,
       borderRadius: 150
     },
-    addListFolderImage: {
+    shareModalImage: {
       width: 70,
       height: 70,
       borderColor: "rgba(0,0,0,0.2)",
@@ -221,7 +270,7 @@ const styles = StyleSheet.create({
       borderRadius: 150,
       backgroundColor:'red'
     },
-    addListFolder: {
+    shareModal: {
       position: 'absolute',
       top: '85%',
       left: '70%',

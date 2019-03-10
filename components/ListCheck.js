@@ -13,50 +13,78 @@ const styles = StyleSheet.create({
     },
     item: {
       marginBottom: '5%',
-      marginLeft : '3%',
-      paddingLeft : '2%',
-      justifyContent : 'center',
-      flexBasis: '94%',
-      height: 50,
+      marginLeft : '5%',
+      marginRight : '3%',
+      flexDirection: 'row',
+      justifyContent : 'space-between',
+      alignItems: 'center',
+      flex : 1,
+      flexBasis: '90%',
+      height: 60,
       backgroundColor: 'powderblue'
     },
     addListFolderImage: {
-      width: 35,
-      height: 35,
+      width: '100%',
+      height: '100%',
       borderColor: "rgba(0,0,0,0.2)",
       borderWidth: 3,
       borderRadius: 150,
       backgroundColor:'red'
     },
     addListFolder: {
-      position: 'absolute',
-      top: '20%',
-      left: '90%',
       zIndex:3
     },
     itemtext: {
-      position: 'absolute',
       fontSize: 20,
-      top: '20%',
-      left : '15%',
       textAlign: 'left',
     },
     itemtextchecked: {
       textDecorationLine: 'line-through',
       textDecorationStyle: 'solid',
-      position: 'absolute',
       fontSize: 20,
-      top: '20%',
-      left : '15%',
+
       textAlign: 'left',
-    }
+    },
+    checkBox: {
+
+      width: "10%",
+      //backgroundColor: 'green'
+    },
+    wText:{
+      marginLeft:"5%",
+      width: "65%",
+      //backgroundColor: 'white'
+    },
+    wAdd:{
+      height: 30,
+      width: 30,
+      //backgroundColor: 'yellow'
+    },
+    wRemove:{
+      height: 30,
+      width: 30,
+      //backgroundColor: 'yellow'
+    },
 });
 
 export default class ListCheck extends Component {
-
+  constructor(props){
+    super(props);
+    this.state ={
+      focus : -1,
+    }
+  }
   static propTypes = {
       items: PropTypes.array.isRequired
   };
+
+componentDidMount(){
+  if((this.props.focus != -1) &&(!this.props.check[this.props.focus]) ){
+
+    this.refs[this.props.focus].focus();
+    this.props.focusDone();
+  }
+}
 
   render() {
     return (
@@ -66,33 +94,54 @@ export default class ListCheck extends Component {
               return this.props.check[index]
               ?(
                   <View style={styles.item} key={index}>
+                      <View style={styles.checkBox}>
                       <CheckBox
+
                       checked={this.props.check[index]}
                       onPress={() => this.props.doCheck(index)}
                       />
-                      <Text style = {styles.itemtextchecked} >{item}</Text>
-
-
-                      <TouchableOpacity style={styles.addListFolder} onPress={() =>{this.props.push(index)}}>
+                      </View>
+                      <View style={styles.wText}>
+                      <Text ref={index} style = {styles.itemtextchecked} multiline={true}>{item}</Text>
+                      </View>
+                      <View style={styles.wAdd}>
+                      <TouchableOpacity style={styles.addListFolder} onPress={() =>{this.props.push(index);}}>
                         <Image style={styles.addListFolderImage} source={require('../images/add_button.png')} />
                       </TouchableOpacity>
+                      </View>
+                      <View style={styles.wRemove}>
+                      <TouchableOpacity style={styles.addListFolder} onPress={() =>{this.props.remove(index);}}>
+                        <Image style={styles.addListFolderImage} source={require('../images/remove_button.png')} />
+                      </TouchableOpacity>
+                      </View>
                   </View>
               )
     :
     (
         <View style={styles.item} key={index}>
+          <View style={styles.checkBox}>
             <CheckBox
             checked={this.props.check[index]}
             onPress={() => this.props.doCheck(index)}
             />
-
-            <TextInput style = {styles.itemtext} value = {item}
+            </View>
+            <View style={styles.wText}>
+            <TextInput ref={index} style = {styles.itemtext} value = {item}
                             onChangeText={(text) =>{this.props.type(index, text)}}
-                            onEndEditing={() =>{this.props.submit(index)}}/>
-
-            <TouchableOpacity style={styles.addListFolder} onPress={() =>{this.props.push(index)}}>
+                            onEndEditing={() =>{this.props.submit(index)}}
+                            multiline={true}
+                            />
+            </View>
+            <View style={styles.wAdd}>
+            <TouchableOpacity style={styles.addListFolder} onPress={() =>{this.props.push(index);}}>
               <Image style={styles.addListFolderImage} source={require('../images/add_button.png')} />
             </TouchableOpacity>
+            </View>
+            <View style={styles.wRemove}>
+            <TouchableOpacity style={styles.addListFolder} onPress={() =>{this.props.remove(index);}}>
+              <Image style={styles.addListFolderImage} source={require('../images/remove_button.png')} />
+            </TouchableOpacity>
+            </View>
         </View>
     )
 })}
