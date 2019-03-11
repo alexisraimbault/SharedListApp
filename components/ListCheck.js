@@ -12,15 +12,13 @@ const styles = StyleSheet.create({
 
     },
     item: {
-      marginBottom: '5%',
       marginLeft : '5%',
-      marginRight : '3%',
+      marginRight : '5%',
       flexDirection: 'row',
       justifyContent : 'space-between',
       alignItems: 'center',
       flex : 1,
       flexBasis: '90%',
-      height: 60,
       backgroundColor: 'powderblue'
     },
     addListFolderImage: {
@@ -35,13 +33,13 @@ const styles = StyleSheet.create({
       zIndex:3
     },
     itemtext: {
-      fontSize: 20,
+      fontSize: 15,
       textAlign: 'left',
     },
     itemtextchecked: {
       textDecorationLine: 'line-through',
       textDecorationStyle: 'solid',
-      fontSize: 20,
+      fontSize: 15,
 
       textAlign: 'left',
     },
@@ -64,6 +62,9 @@ const styles = StyleSheet.create({
       height: 30,
       width: 30,
       //backgroundColor: 'yellow'
+    },
+    keyboardSafety:{
+      height: 80,
     },
 });
 
@@ -130,6 +131,9 @@ componentDidMount(){
                             onChangeText={(text) =>{this.props.type(index, text)}}
                             onEndEditing={() =>{this.props.submit(index)}}
                             multiline={true}
+                            keyboardType="default"
+                            returnKeyType="done"
+                            onKeyPress={(e)=>{this.props.handleKeyDown(e,index)}}
                             />
             </View>
             <View style={styles.wAdd}>

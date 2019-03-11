@@ -4,7 +4,7 @@ import {
   Text,
   StyleSheet,TextInput,
   ScrollView,
-  Image, Switch, TouchableOpacity
+  Image, Switch, TouchableOpacity, KeyboardAvoidingView
 } from "react-native";
 
 //library imports
@@ -14,6 +14,8 @@ import  firebase from "firebase";
 import ListCheck from '../components/ListCheck';
 import ShareModal from '../components/ShareModal';
 import {db} from '../config';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import dismissKeyboard from 'react-native-dismiss-keyboard';
 
 //custom components imports
 
@@ -28,17 +30,27 @@ class WriteList extends Component{
     this.check = this.check.bind(this);
     this.submit = this.submit.bind(this);
     this.share = this.share.bind(this);
+    this.handleKeyDown = this.handleKeyDown.bind(this);
     this.state ={
       focus: -1,
       text: [],
+      tmpText: [],
       items: [],
       keys: [],
       sortedKeys: [],
       newListContent:'',
       check: [],
       list: true,
+      return :false,
       updating: false,
       listText : ""
+    }
+  }
+
+  handleKeyDown(e) {
+    if(e.nativeEvent.key == "Enter"){
+        dismissKeyboard();
+        this.setState({return : true});
     }
   }
   openShareModal(){
@@ -48,9 +60,14 @@ class WriteList extends Component{
   type(ind, text){
     //var ref = db.ref("lists/"+this.props.navigation.getParam('index')+'/items/'+this.state.keys[ind]);
     //ref.update({text : text});
-    var tmp = this.state.text;
-    tmp[ind] = text;
-    this.setState({text : tmp});
+    if(!this.state.return){
+      var tmp = this.state.text;
+      tmp[ind] = text;
+      this.setState({text : tmp});
+    }
+    else{
+      this.setState({return : false});
+    }
   }
   submit(ind){
     var ref = db.ref("lists/"+this.props.navigation.getParam('index')+'/items/'+this.state.keys[ind]);
@@ -116,7 +133,9 @@ class WriteList extends Component{
           }
        }.bind(this))
   }
-
+  editText(){
+    this.setState({text : this.state.listText.split('\n')});
+  }
   focusDone(){
     this.setState({focus :-1});
   }
@@ -147,17 +166,15 @@ class WriteList extends Component{
     var tmp1 = [];
     var tmp2 = [];
     var tmpk = [];
-    var tmp3 = '';
     for(let i=0; i < items.length ; i++){
       tmp1.push(items[i].check);
       tmp2.push(items[i].text);
       tmpk.push(items[i].key);
-      var tmp4 = tmp3  + items[i].text;
       }
       this.setState({check : tmp1});
       this.setState({text : tmp2});
       this.setState({keys : tmpk});
-      this.setState({listText : tmp4});
+      this.setState({listText : tmp2.join("\n")});
   }
   componentDidMount() {
     var ref = db.ref("lists/"+this.props.navigation.getParam('index'));
@@ -213,8 +230,23 @@ class WriteList extends Component{
             listsRef.update({
                 list: true
              });
+             for(let i = 0; i < this.state.tmpText.length; i++){
+               if(i<this.state.text.length){
+                 if(this.state.tmpText[i]!=this.state.text[i]){
+                   var ref = db.ref("lists/"+this.props.navigation.getParam('index')+'/items/'+this.state.keys[i]);
+                   ref.update({text : this.state.tmpText[i]});
+                 }
+               }
+               else{
+                 var ref = db.ref("lists/"+this.props.navigation.getParam('index')+'/items');
+                 ref.push({
+                   check : false,
+                   text : this.state.tmpText[i],
+                   ind : i
+                 });
+               }
           }
-         }}
+        }}}
 
          value = {this.state.list}/>
          <TouchableOpacity style={styles.shareModal} onPress={this.openShareModal}>
@@ -224,14 +256,21 @@ class WriteList extends Component{
 
          {
            this.state.list
-           ?<View style={styles.container}><ScrollView ref={'scroll'}>
+           ?<KeyboardAvoidingView
+            style={styles.container}
+            behavior="padding"><ScrollView ref={'scroll'}>
            {
                this.state.text.length > 0
-               ? <ListCheck items = {this.state.text} check = {this.state.check} focus = {this.state.focus} focusDone = {this.focusDone} type = {this.type} submit = {this.submit} push = {this.push} remove = {this.remove} doCheck = {this.check}/>
+               ? <ListCheck items = {this.state.text} check = {this.state.check} focus = {this.state.focus} focusDone = {this.focusDone} handleKeyDown = {this.handleKeyDown} type = {this.type} submit = {this.submit} push = {this.push} remove = {this.remove} doCheck = {this.check}/>
                : <Text>No Items</Text>
            }
-           </ScrollView></View>
-           :<TextInput multiline = {true} numberOfLines = {this.state.text.length} value = {this.state.text.join('\n')}/>
+           </ScrollView>
+           <View style={styles.keyboardSafety} >
+           </View></KeyboardAvoidingView>
+           :<TextInput multiline = {true}
+           onChangeText={(text) =>{this.setState({listText:text});this.setState({tmpText : this.state.listText.split('\n')});}}
+           onEndEditing={() =>{this.setState({tmpText : this.state.listText.split('\n')});}}
+           value = {this.state.listText}/>
         }
         <ShareModal ref={'shareModal'} uid={this.props.userInfo.uid}  share = {this.share}>
 
@@ -275,5 +314,8 @@ const styles = StyleSheet.create({
       top: '85%',
       left: '70%',
       zIndex:3
-    }
+    },
+    keyboardSafety:{
+      height: 40,
+    },
 });
