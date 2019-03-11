@@ -12,6 +12,7 @@ import { Button, Container, Header, Content, Left, Body,Title,Right } from 'nati
 import { connect } from 'react-redux'
 import  firebase from "firebase";
 import ListCheck from '../components/ListCheck';
+import ListItems from '../components/ListItems';
 import ShareModal from '../components/ShareModal';
 import {db} from '../config';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
@@ -261,7 +262,8 @@ class WriteList extends Component{
             behavior="padding"><ScrollView ref={'scroll'}>
            {
                this.state.text.length > 0
-               ? <ListCheck items = {this.state.text} check = {this.state.check} focus = {this.state.focus} focusDone = {this.focusDone} handleKeyDown = {this.handleKeyDown} type = {this.type} submit = {this.submit} push = {this.push} remove = {this.remove} doCheck = {this.check}/>
+               ? //<ListCheck items = {this.state.text} check = {this.state.check} focus = {this.state.focus} focusDone = {this.focusDone} handleKeyDown = {this.handleKeyDown} type = {this.type} submit = {this.submit} push = {this.push} remove = {this.remove} doCheck = {this.check}/>
+               <ListItems items = {this.state.text} check = {this.state.check} focus = {this.state.focus} focusDone = {this.focusDone} handleKeyDown = {this.handleKeyDown} type = {this.type} submit = {this.submit} push = {this.push} remove = {this.remove} doCheck = {this.check}/>
                : <Text>No Items</Text>
            }
            </ScrollView>
