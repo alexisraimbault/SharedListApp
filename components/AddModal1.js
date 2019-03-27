@@ -68,8 +68,13 @@ export default class AddModal1 extends Component{
               name: this.state.newListName,
               list:true,
               text:'',
-              items:{}
+              items:{},
+              creator: this.props.uid,
+              users:{}
             }).getKey();
+            firebase.database().ref('lists/'+refKey+'/users').push({
+              user : this.props.uid,
+            });
             firebase.database().ref('users/'+this.props.uid+'/lists/'+this.props.index+'/'+this.props.liste).push({
               key:refKey,
             });

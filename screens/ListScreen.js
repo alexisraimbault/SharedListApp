@@ -68,7 +68,12 @@ class ListScreen extends Component{
         tmp.push(listItem[1]);
       }
       else{
-        tmp.push(listItem[2]);
+        if(listItem.length == 6){
+          tmp.push(listItem[3]);
+        }
+        else{
+          tmp.push(listItem[2]);
+        }
       }
       this.setState({lists : tmp});
     }

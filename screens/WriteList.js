@@ -14,6 +14,7 @@ import  firebase from "firebase";
 import ListCheck from '../components/ListCheck';
 import ListItems from '../components/ListItems';
 import ShareModal from '../components/ShareModal';
+import UserModal from '../components/UserModal';
 import {db} from '../config';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import dismissKeyboard from 'react-native-dismiss-keyboard';
@@ -24,6 +25,7 @@ class WriteList extends Component{
   constructor(props){
     super(props);
     this.openShareModal = this.openShareModal.bind(this);
+    this.openUserModal = this.openUserModal.bind(this);
     this.focusDone=this.focusDone.bind(this);
     this.type = this.type.bind(this);
     this.push = this.push.bind(this);
@@ -56,6 +58,9 @@ class WriteList extends Component{
   }
   openShareModal(){
     this.refs.shareModal.openModal();
+  }
+  openUserModal(){
+    this.refs.userModal.openModal();
   }
 
   type(ind, text){
@@ -133,6 +138,10 @@ class WriteList extends Component{
             }
           }
        }.bind(this))
+       var ref2 = db.ref("lists/"+this.props.navigation.getParam('index')+"/users");
+       ref2.push({
+         user : uid
+       })
   }
   editText(){
     this.setState({text : this.state.listText.split('\n')});
@@ -253,7 +262,9 @@ class WriteList extends Component{
          <TouchableOpacity style={styles.shareModal} onPress={this.openShareModal}>
            <Image style={styles.shareModalImage} source={require('../images/add_button.png')} />
          </TouchableOpacity>
-
+         <TouchableOpacity style={styles.userModal} onPress={this.openUserModal}>
+           <Image style={styles.shareModalImage} source={require('../images/dots_button.png')} />
+         </TouchableOpacity>
 
          {
            this.state.list
@@ -275,9 +286,10 @@ class WriteList extends Component{
            value = {this.state.listText}/>
         }
         <ShareModal ref={'shareModal'} uid={this.props.userInfo.uid}  share = {this.share}>
-
         </ShareModal>
-         </Container>
+        <UserModal ref={'userModal'} uid={this.props.userInfo.uid}  share = {this.share} list = {this.props.navigation.getParam('index')}>
+        </UserModal>
+        </Container>
 
     )
   }
@@ -315,6 +327,12 @@ const styles = StyleSheet.create({
       position: 'absolute',
       top: '85%',
       left: '70%',
+      zIndex:3
+    },
+    userModal: {
+      position: 'absolute',
+      top: '85%',
+      left: '60%',
       zIndex:3
     },
     keyboardSafety:{

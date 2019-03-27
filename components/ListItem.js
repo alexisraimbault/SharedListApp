@@ -2,10 +2,9 @@ import React, { Component } from 'react';
 import {  View, Text, StyleSheet, TextInput, Dimensions, ScrollView,Image, TouchableOpacity, PanResponder, Animated} from 'react-native';
 import { CheckBox } from 'react-native-elements'
 
-
+const { width, height } = Dimensions.get("window");
 
 export default class ListItem extends Component {
-  translateX2 = new Animated.Value(Dimensions.get("window").width);
   translateX = new Animated.Value(0);
   _panResponder = PanResponder.create({
     onMoveShouldSetResponderCapture: (evt, gestureState) => {
@@ -20,13 +19,11 @@ export default class ListItem extends Component {
                                               }]),
     onPanResponderRelease: (e, {vx, dx}) => {
       const screenWidth = Dimensions.get("window").width;
-      if (vx >= 0.6 || dx >= 0.4 * screenWidth) {
+      if ( dx >= 0.4 * screenWidth) {
         this.props.doCheck(this.props.index);
       }
       else{
-        console.log(vx);
-        console.log(dx);
-        if (vx <= -0.6 || dx <= -0.4 * screenWidth) {
+        if ( dx <= -0.6 * screenWidth) {
           this.props.remove(this.props.index);
         }
       }
@@ -34,13 +31,10 @@ export default class ListItem extends Component {
         toValue: 0,
         bounciness: 10
       }).start();
-      Animated.spring(this.translateX2, {
-        toValue: Dimensions.get("window").width,
-        bounciness: 10
-      }).start();
 
     }
   });
+
 
   componentDidMount(){
     if((this.props.focus != -1) &&(!this.props.check[this.props.focus])&&(this.props.focus == this.props.index) ){
@@ -51,6 +45,19 @@ export default class ListItem extends Component {
   }
 
   render(){
+    const checkOpacity = this.translateX.interpolate( {
+      inputRange: [0, width],
+      outputRange: [0,1]
+    });
+    const supprOpacity = this.translateX.interpolate( {
+      inputRange: [-width,0],
+      outputRange: [1,0]
+    });
+    const negX = this.translateX.interpolate( {
+      inputRange: [-width,0],
+      outputRange: [width, 0]
+    });
+    const w = 0.95%width;
     return this.props.check[this.props.index]
     ?(
       /*<Animated.View
@@ -58,8 +65,10 @@ export default class ListItem extends Component {
         </Animated.View>*/
         <View style={styles.item} key={this.props.index}{...this._panResponder.panHandlers}>
             <Animated.View
-              style={{width: this.translateX, height: 75, backgroundColor : 'green',position : 'absolute', zIndex :5 }}
-              opacity={0.5}>
+              style={{width: this.translateX,left: 0, height: 75, backgroundColor : 'green',position : 'absolute', opacity : checkOpacity }} >
+            </Animated.View>
+            <Animated.View
+              style={{width: negX,right:w, height: 75, backgroundColor : 'red',position : 'absolute', opacity : supprOpacity }} >
             </Animated.View>
             <View style={styles.checkBox}>
             <CheckBox
@@ -87,14 +96,18 @@ export default class ListItem extends Component {
     (
       <View style={styles.item} key={this.props.index}{...this._panResponder.panHandlers}>
       <Animated.View
-        style={{width: this.translateX, height: 75, backgroundColor : 'green',position : 'absolute', zIndex :5 }}
-        opacity={0.5} >
+        style={{width: this.translateX,left: 0, height: 75, backgroundColor : 'green',position : 'absolute', opacity : checkOpacity }} >
+      </Animated.View>
+      <Animated.View
+        style={{width: negX,right:w, height: 75, backgroundColor : 'red',position : 'absolute', opacity : supprOpacity }} >
       </Animated.View>
       <View style={styles.checkBox}>
         <CheckBox
+        style= {{zIndex : 5}}
         checked={this.props.check[this.props.index]}
         onPress={() => this.props.doCheck(this.props.index)}
         />
+
         </View>
         <View style={styles.wText} >
         <TextInput ref={this.props.index} style = {styles.itemtext} value = {this.props.item}
@@ -116,7 +129,6 @@ export default class ListItem extends Component {
           <Image style={styles.addListFolderImage} source={require('../images/remove_button.png')} />
         </TouchableOpacity>
         </View>
-
       </View>
     )
   }
